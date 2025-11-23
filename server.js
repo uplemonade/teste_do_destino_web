@@ -23,7 +23,7 @@ app.post('/create-checkout-session', async (req, res) => {
                             name: 'Análise Espiritual Completa',
                             description: 'Resultado detalhado com versículos e recomendações de livros',
                         },
-                        unit_amount: 199, // R$ 1,99
+                        unit_amount: 399, // R$ 1,99
                     },
                     quantity: 1,
                 },
