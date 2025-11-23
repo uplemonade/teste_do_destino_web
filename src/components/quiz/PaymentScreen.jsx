@@ -3,101 +3,45 @@ import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Lock, CreditCard, Check, Sparkles } from 'lucide-react';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-// Replace with your actual Stripe Publishable Key
-const stripePromise = loadStripe("pk_live_EPHllQIGdkEwBOquJ6HwY3hx");
+const CheckoutButton = () => {
+  const [loading, setLoading] = useState(false);
 
-const CheckoutForm = ({ onPaymentComplete }) => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState(null);
+  const handleCheckout = () => {
+    setLoading(true);
+    // Redireciona diretamente para o Payment Link do Stripe
+    //window.location.href = "https://buy.stripe.com/00w8wH0Hu1gleFZf9jgjC00"; 
+    window.location.href = "https://buy.stripe.com/test_6oUeV5dugf7b0P99OZgjC01";
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setProcessing(true);
-    setError(null);
-
-    if (!stripe || !elements) {
-      setProcessing(false);
-      return;
-    }
-
-    const cardElement = elements.getElement(CardElement);
-
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      type: 'card',
-      card: cardElement,
-    });
-
-    if (error) {
-      setError(error.message);
-      setProcessing(false);
-    } else {
-      console.log('[PaymentMethod]', paymentMethod);
-      // Simulate backend processing
-      setTimeout(() => {
-        onPaymentComplete();
-      }, 1000);
-    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full space-y-8">
-      <div className="bg-white/10 p-4 rounded-lg border border-white/20">
-        <CardElement
-          options={{
-            style: {
-              base: {
-                fontSize: '16px',
-                color: '#ffffff',
-                '::placeholder': {
-                  color: '#aab7c4',
-                },
-              },
-              invalid: {
-                color: '#ff4444',
-              },
-            },
-          }}
-        />
-      </div>
-
-      {error && (
-        <div className="text-red-400 text-sm text-center bg-red-900/20 p-2 rounded">
-          {error}
-        </div>
+    <Button
+      onClick={handleCheckout}
+      disabled={loading}
+      className="w-full bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white font-bold text-lg py-6 rounded-xl shadow-2xl shadow-amber-500/30 transition-all duration-300 hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
+    >
+      {loading ? (
+        <span className="flex items-center justify-center gap-2">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          >
+            <Sparkles className="w-5 h-5" />
+          </motion.div>
+          Redirecionando...
+        </span>
+      ) : (
+        <span className="flex items-center justify-center gap-2">
+          <CreditCard className="w-5 h-5" />
+          Pagar e Ver Resultado
+        </span>
       )}
-
-      <Button
-        type="submit"
-        disabled={!stripe || processing}
-        className="w-full bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white font-bold text-lg py-6 rounded-xl shadow-2xl shadow-amber-500/30 transition-all duration-300 hover:scale-105 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100"
-      >
-        {processing ? (
-          <span className="flex items-center justify-center gap-2">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            >
-              <Sparkles className="w-5 h-5" />
-            </motion.div>
-            Processando...
-          </span>
-        ) : (
-          <span className="flex items-center justify-center gap-2">
-            <CreditCard className="w-5 h-5" />
-            Pagar e Ver Resultado
-          </span>
-        )}
-      </Button>
-    </form>
+    </Button>
   );
 };
 
-export default function PaymentScreen({ onPaymentComplete }) {
+export default function PaymentScreen() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#4B0000] via-[#3d0000] to-[#2b0000]">
       <motion.div
@@ -107,7 +51,8 @@ export default function PaymentScreen({ onPaymentComplete }) {
         className="w-full max-w-md"
       >
         <Card className="bg-white/5 backdrop-blur-sm border-white/10 p-8 md:p-10 shadow-2xl">
-          {/* Lock Icon */}
+
+          {/* Ícone Cadeado */}
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -119,7 +64,7 @@ export default function PaymentScreen({ onPaymentComplete }) {
             </div>
           </motion.div>
 
-          {/* Title */}
+          {/* Título */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -134,7 +79,7 @@ export default function PaymentScreen({ onPaymentComplete }) {
             </p>
           </motion.div>
 
-          {/* Price */}
+          {/* Preço */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -143,14 +88,14 @@ export default function PaymentScreen({ onPaymentComplete }) {
           >
             <p className="text-white/60 text-sm mb-2">Investimento</p>
             <div className="text-5xl font-bold text-white mb-1">
-              R$ 1,99
+              R$ 3,99
             </div>
             <p className="text-amber-300 text-sm font-semibold">
               Pagamento único
             </p>
           </motion.div>
 
-          {/* Benefits */}
+          {/* Benefícios */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -178,18 +123,16 @@ export default function PaymentScreen({ onPaymentComplete }) {
             ))}
           </motion.div>
 
-          {/* Payment Form */}
+          {/* Botão de Pagamento */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
           >
-            <Elements stripe={stripePromise}>
-              <CheckoutForm onPaymentComplete={onPaymentComplete} />
-            </Elements>
+            <CheckoutButton />
           </motion.div>
 
-          {/* Security Message */}
+          {/* Mensagem de segurança */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -198,6 +141,7 @@ export default function PaymentScreen({ onPaymentComplete }) {
           >
             🔒 Pagamento 100% seguro e criptografado
           </motion.p>
+
         </Card>
       </motion.div>
     </div>

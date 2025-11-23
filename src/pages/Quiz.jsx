@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { base44 } from '@/api/base44Client';
 import QuizQuestion from '../components/quiz/QuizQuestion';
 import QuizResult from '../components/quiz/QuizResult';
 import PaymentScreen from '../components/quiz/PaymentScreen';
+import { useLocation } from 'react-router-dom';
 
 const questions = [
   {
@@ -218,6 +219,28 @@ export default function Quiz() {
   const [showPayment, setShowPayment] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check for success query param from Stripe redirect
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get('success') === 'true') {
+      const savedResult = localStorage.getItem('quizResult');
+      if (savedResult) {
+        const parsedResult = JSON.parse(savedResult);
+
+        // Re-attach icon immediately
+        let icon;
+        if (parsedResult.percentage <= 30) icon = Heart;
+        else if (parsedResult.percentage <= 65) icon = AlertTriangle;
+        else icon = Flame;
+
+        setResult({ ...parsedResult, icon });
+        setShowResult(true);
+        setStarted(true); // Ensure we are in "started" mode to show result
+      }
+    }
+  }, [location]);
 
   const handleStart = () => {
     setStarted(true);
@@ -239,9 +262,9 @@ export default function Quiz() {
   const calculateResult = async (finalAnswers) => {
     const totalPoints = Object.values(finalAnswers).reduce((sum, points) => sum + points, 0);
     const percentage = Math.round((totalPoints / 40) * 100);
-    
+
     let category, message, verse, books, icon;
-    
+
     if (percentage <= 30) {
       category = "Caminho da Luz";
       message = "Você está no caminho da luz. Seu coração é guiado pelo amor, perdão e humildade. Continue firme, cultivando a fé e ajudando quem precisa.";
@@ -281,9 +304,14 @@ export default function Quiz() {
       message,
       verse,
       books,
-      icon,
+      icon, // Note: Icon component won't serialize well to JSON, might need handling
       answers: finalAnswers
     };
+
+    // Save to localStorage for persistence across redirects
+    // We need to handle the icon component separately or reconstruct it
+    const resultToSave = { ...resultData, icon: null }; // Don't save the component
+    localStorage.setItem('quizResult', JSON.stringify(resultToSave));
 
     setResult(resultData);
 
@@ -304,6 +332,8 @@ export default function Quiz() {
   };
 
   const handlePaymentComplete = () => {
+    // This might not be called directly with Stripe Checkout redirect flow
+    // But keeping it for compatibility or manual testing
     setShowPayment(false);
     setShowResult(true);
   };
@@ -315,6 +345,9 @@ export default function Quiz() {
     setShowPayment(false);
     setShowResult(false);
     setResult(null);
+    localStorage.removeItem('quizResult');
+    // Remove query param
+    window.history.replaceState({}, document.title, window.location.pathname);
   };
 
   if (showPayment) {

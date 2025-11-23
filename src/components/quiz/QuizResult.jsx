@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, BookOpen, Quote, Heart, AlertTriangle, Flame, Sparkles } from 'lucide-react';
 
 export default function QuizResult({ result, onRestart }) {
-  const Icon = result.icon;
+  const Icon = result.icon || Sparkles;
 
   const getColorScheme = () => {
     if (result.percentage <= 30) {
@@ -57,7 +57,7 @@ export default function QuizResult({ result, onRestart }) {
             <div className={`inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br ${colors.primary} ${colors.glow} shadow-2xl mb-6`}>
               <Icon className="w-12 h-12 text-white" />
             </div>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
