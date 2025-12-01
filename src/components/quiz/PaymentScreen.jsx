@@ -11,7 +11,7 @@ const CheckoutButton = () => {
     setLoading(true);
     // Redireciona diretamente para o Payment Link do Stripe
     //window.location.href = "https://buy.stripe.com/00w8wH0Hu1gleFZf9jgjC00"; 
-    window.location.href = "https://buy.stripe.com/test_6oUeV5dugf7b0P99OZgjC01";
+    window.location.href = "https://buy.stripe.com/28EbIT3TGgbfcxRbX7gjC02";
 
   };
 
